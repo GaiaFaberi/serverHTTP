@@ -40,13 +40,24 @@ public class MyThread extends Thread {
 
             System.out.println("Richiesta terminata");
             File file;
+
+            if(resource.endsWith("/"))
+                resource = resource + "index.html";
+
+            
             if(resource.equals("/")){
                 file = new File("htdocs/ProgettoFinaleFaberi/index.html");
             }else{
              file = new File("htdocs/ProgettoFinaleFaberi" + resource);
             }
 
-            if(file.exists()){
+            if(file.isDirectory()){
+                out.writeBytes("HTTP/1.1 301 Moved Permanently\n");
+                out.writeBytes("Location:  " + resource + "\n");
+                out.writeBytes("Content- Length: 0 " + "\n");
+                
+                out.writeBytes("\n");
+            }else if(file.exists()){
                 InputStream input = new FileInputStream(file);
                 out.writeBytes("HTTP/1.1 200 OK\n");
                 out.writeBytes("Content-Type: " + MyThread.getContentType(resource) + "\n");
