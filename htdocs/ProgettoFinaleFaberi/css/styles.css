@@ -1,0 +1,18 @@
+/*comune*/
+.sfondo{
+    background-image: url(../images/spazio.jpg);
+}
+
+/*HOME*/
+.tabella{
+    width: 55%;
+
+}
+
+.tabella tr, td, th{
+    border:2px solid black;
+}
+
+div li{
+    padding:20px;
+}

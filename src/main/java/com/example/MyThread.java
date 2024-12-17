@@ -20,7 +20,7 @@ public class MyThread extends Thread {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()))) {
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
 
-            String responseBody;
+            
             String firstLine = in.readLine();
             System.out.println(firstLine);
             String[] request = firstLine.split(" ");
@@ -29,8 +29,7 @@ public class MyThread extends Thread {
             String resource = request[1];
             String version = request[2];
             String header;
-            File file;
-            InputStream input;
+            
             byte[] buf;
             int n;
 
@@ -40,51 +39,30 @@ public class MyThread extends Thread {
             } while (!header.isEmpty());
 
             System.out.println("Richiesta terminata");
+            File file;
+            if(resource.equals("/")){
+                file = new File("htdocs/ProgettoFinaleFaberi/index.html");
+            }else{
+             file = new File("htdocs/ProgettoFinaleFaberi" + resource);
+            }
 
-            switch (resource) {
-                case "/":
-                
-                case "/index.html":
-
-                     file = new File("htdocs/index.html");
-                     input = new FileInputStream(file);
-
-                    out.writeBytes("HTTP/1.1 200 OK\n");
-                    out.writeBytes("Content-Length: " + file.length() + "\n");
-                    out.writeBytes("Content-Type: text/html\n");
-                    out.writeBytes("\n");
-                    buf = new byte[8192];
-                   
-                    while((n = input.read(buf)) != -1){
-                        out.write(buf, 0, n);
-                    }
-                    input.close();
-                    break;
-                
-                case "/file.txt":
-                 file = new File("htdocs/file.txt");
-                 input = new FileInputStream(file);
-
+            if(file.exists()){
+                InputStream input = new FileInputStream(file);
                 out.writeBytes("HTTP/1.1 200 OK\n");
+                out.writeBytes("Content-Type: " + MyThread.getContentType(resource) + "\n");
                 out.writeBytes("Content-Length: " + file.length() + "\n");
-                out.writeBytes("Content-Type: text/plain\n");
                 out.writeBytes("\n");
                 buf = new byte[8192];
-                
-                while((n = input.read(buf)) != -1){
+
+                while ((n = input.read(buf)) != -1) {
                     out.write(buf, 0, n);
                 }
                 input.close();
-                break;
-                
-                default:
-                    out.writeBytes("HTTP/1.1 404 Not Found\n");
-                    out.writeBytes("Content-Length: 0"  + "\n");
-                    out.writeBytes("\n");
-
-              
+            }else{
+                out.writeBytes("HTTP/1.1 404 Not Found\n");
+                out.writeBytes("Content-Length: 0" + "\n");
+                out.writeBytes("\n");
             }
-
             
 
         } catch (IOException e) {
@@ -93,21 +71,20 @@ public class MyThread extends Thread {
         }
     }
 
-    public String getConentType(File f){
-        String[] s = f.getName().split("\\.");
+    public static String getContentType(String resource) {
+            String[] s = resource.split("\\.");
         String ext = s[s.length - 1];
-        switch(ext){
+        switch (ext) {
             case "html":
             case "htm":
                 return "text/html";
-            case "pnj":
-                return "image/png";
+            case "jpg":
+                return "image/jpg";
             case "css":
                 return "text/css";
             default:
                 return "";
         }
-        
 
     }
 }
